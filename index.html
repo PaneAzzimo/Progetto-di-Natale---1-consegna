@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do App</title>
+    <style>
+        *{
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        h1{
+           font-weight: bold;
+           color: #5f7ea6;
+        }
+        body{
+            background-color: antiquewhite;
+        }
+        .form{
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .container{
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            gap: 20px;
+            margin-left: 20px;
+        }
+        input[type="text"]{
+          padding: 10px 12px;
+          border-radius: 8px;
+          border: 1px solid #ddd7cf;
+          flex: 1;
+        }
+        
+        button{
+          padding: 10px 20px;
+          border: none;
+          border-radius: 999px;
+          background-color: #5f7ea6;
+          color: white;
+          cursor: pointer;
+          transition: transform 0.2s, background 0.2s;
+        }
+        
+        button:hover{
+          background-color: #5f7ea6;
+          transform: translateY(-2px);
+        }
+        ul{
+          list-style: none;
+          padding: 0;
+          width: 100%;
+          max-width: 500px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        li{
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+        }
+
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>La nostra To-Do App</h1>
+        <form class="form">
+            <input type="text" id="inputAttivita" placeholder="Inserisci una nuova attività">
+            <button onclick="aggiungiAttivita()">Aggiungi</button>
+        </form>
+        <ul id="listaAttivita"></ul>
+        
+    </div>
+    
+    
+    
+
+    
+    
+
+    <script>
+        /*
+            Recuperiamo le attività dal localStorage.
+            Se non esistono dati salvati, usiamo un array vuoto.
+        */
+        let attivita = JSON.parse(localStorage.getItem("attivita")) || [];
+
+        /*
+            Salva l'array delle attività nel browser
+        */
+        function salvaAttivita() {
+            localStorage.setItem("attivita", JSON.stringify(attivita));
+        }
+
+        /*
+            Mostra tutte le attività nella pagina HTML
+        */
+        function mostraAttivita() {
+            const lista = document.getElementById("listaAttivita");
+
+            // Svuota la lista prima di ridisegnarla
+            lista.innerHTML = "";
+
+            //forEach scorre tutte le attività presenti nell'array
+
+            attivita.forEach((singolaAttivita, indice) => {
+                const elementoLista = document.createElement("li");
+
+                // Checkbox per segnare l'attività come completata
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = singolaAttivita.completata;
+
+                // Quando la checkbox cambia stato
+                checkbox.onchange = () => cambiaStatoAttivita(indice);
+
+                // Testo dell'attività
+                const testo = document.createElement("span");
+                testo.textContent = singolaAttivita.testo;
+
+                // Pulsante per eliminare l'attività
+                const bottoneElimina = document.createElement("button");
+                bottoneElimina.textContent = "Elimina";
+                bottoneElimina.onclick = () => eliminaAttivita(indice);
+
+                // Inseriamo tutti gli elementi nel <li>
+                elementoLista.appendChild(checkbox);
+                elementoLista.appendChild(testo);
+                elementoLista.appendChild(bottoneElimina);
+
+                // Inseriamo il <li> nella lista
+                lista.appendChild(elementoLista);
+            });
+        }
+
+        
+            //Aggiunge una nuova attività all'array
+        
+        function aggiungiAttivita() {
+            const input = document.getElementById("inputAttivita");
+            const testoInserito = input.value.trim();
+
+            // Se il campo è vuoto, non fa nulla
+            if (testoInserito === "") return;
+
+            /*
+                Aggiungiamo un nuovo oggetto all'array
+                completata parte sempre da false
+            */
+            attivita.push({
+                testo: testoInserito,
+                completata: false
+            });
+
+            // Svuota il campo di input
+            input.value = "";
+
+            salvaAttivita();
+            mostraAttivita();
+        }
+
+        /*
+            Cambia lo stato dell'attività 
+        */
+        function cambiaStatoAttivita(indice) {
+
+            attivita[indice].completata = !attivita[indice].completata;
+
+            salvaAttivita();
+            mostraAttivita();
+        }
+
+        /*
+            Elimina un'attività dall'array
+        */
+        function eliminaAttivita(indice) {
+            /*
+                splice rimuove elementi da un array
+                indice = posizione
+                1 = numero di elementi da eliminare
+            */
+            attivita.splice(indice, 1);
+
+            salvaAttivita();
+            mostraAttivita();
+        }
+
+        // Mostra le attività quando la pagina viene caricata
+        mostraAttivita();
+    </script>
+
+</body>
+</html>
